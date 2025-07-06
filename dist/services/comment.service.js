@@ -89,6 +89,47 @@ let CommentsService = class CommentsService {
         });
         return Promise.all(topComments.map((comment) => this.loadReplies(comment)));
     }
+    async update(id, content) {
+        const comment = await this.commentRepo.findOne({ where: { id } });
+        if (!comment) {
+            throw new common_1.NotFoundException(`Comment with id ${id} not found`);
+        }
+        const now = new Date();
+        const createdAt = new Date(comment.createdAt);
+        const diffMs = now.getTime() - createdAt.getTime();
+        const diffMinutes = diffMs / (1000 * 60);
+        if (diffMinutes > 15) {
+            throw new common_1.NotFoundException(`Edit period expired for comment with id ${id}`);
+        }
+        comment.content = content;
+        return this.commentRepo.save(comment);
+    }
+    async delete(id) {
+        const comment = await this.commentRepo.findOne({ where: { id } });
+        if (!comment) {
+            throw new common_1.NotFoundException(`Comment with id ${id} not found`);
+        }
+        comment.deletedAt = new Date();
+        await this.commentRepo.save(comment);
+    }
+    async restore(id) {
+        const comment = await this.commentRepo.findOne({ where: { id } });
+        if (!comment) {
+            throw new common_1.NotFoundException(`Comment with id ${id} not found`);
+        }
+        if (!comment.deletedAt) {
+            throw new common_1.NotFoundException(`Comment with id ${id} is not deleted`);
+        }
+        const now = new Date();
+        const deletedAt = new Date(comment.deletedAt);
+        const diffMs = now.getTime() - deletedAt.getTime();
+        const diffMinutes = diffMs / (1000 * 60);
+        if (diffMinutes > 15) {
+            throw new common_1.NotFoundException(`Restore period expired for comment with id ${id}`);
+        }
+        comment.deletedAt = undefined;
+        return this.commentRepo.save(comment);
+    }
 };
 exports.CommentsService = CommentsService;
 exports.CommentsService = CommentsService = __decorate([

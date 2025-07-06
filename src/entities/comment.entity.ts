@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { PostEntity } from './post.entity';
 import { User } from './user.entity';
@@ -34,4 +35,7 @@ export class Comment {
 
   @OneToMany(() => Comment, (comment) => comment.parent)
   replies!: Comment[];
+
+  @DeleteDateColumn({ nullable: true })
+  deletedAt?: Date;
 }

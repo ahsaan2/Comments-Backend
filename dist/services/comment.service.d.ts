@@ -13,4 +13,7 @@ export declare class CommentsService {
     private loadReplies;
     findAll(): Promise<Comment[]>;
     getThreadedComments(postId: number): Promise<any[]>;
+    update(id: number, content: string): Promise<Comment>;
+    delete(id: number): Promise<void>;
+    restore(id: number): Promise<Comment>;
 }

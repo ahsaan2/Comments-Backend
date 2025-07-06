@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, IsNull } from "typeorm";
+import { Repository, IsNull, MoreThan } from "typeorm";
 import { Comment } from "src/entities/comment.entity";
 import { PostEntity } from "src/entities/post.entity";
 import { User } from "src/entities/user.entity";
@@ -104,5 +104,50 @@ async create(dto: CreateCommentDto): Promise<Comment> {
     });
 
     return Promise.all(topComments.map((comment) => this.loadReplies(comment)));
+  }
+
+  async update(id: number, content: string): Promise<Comment> {
+    const comment = await this.commentRepo.findOne({ where: { id } });
+    if (!comment) {
+      throw new NotFoundException(`Comment with id ${id} not found`);
+    }
+    // Restrict editing to within 15 minutes of creation
+    const now = new Date();
+    const createdAt = new Date(comment.createdAt);
+    const diffMs = now.getTime() - createdAt.getTime();
+    const diffMinutes = diffMs / (1000 * 60);
+    if (diffMinutes > 15) {
+      throw new NotFoundException(`Edit period expired for comment with id ${id}`);
+    }
+    comment.content = content;
+    return this.commentRepo.save(comment);
+  }
+
+  async delete(id: number): Promise<void> {
+    const comment = await this.commentRepo.findOne({ where: { id } });
+    if (!comment) {
+      throw new NotFoundException(`Comment with id ${id} not found`);
+    }
+    comment.deletedAt = new Date();
+    await this.commentRepo.save(comment);
+  }
+
+  async restore(id: number): Promise<Comment> {
+    const comment = await this.commentRepo.findOne({ where: { id } });
+    if (!comment) {
+      throw new NotFoundException(`Comment with id ${id} not found`);
+    }
+    if (!comment.deletedAt) {
+      throw new NotFoundException(`Comment with id ${id} is not deleted`);
+    }
+    const now = new Date();
+    const deletedAt = new Date(comment.deletedAt);
+    const diffMs = now.getTime() - deletedAt.getTime();
+    const diffMinutes = diffMs / (1000 * 60);
+    if (diffMinutes > 15) {
+      throw new NotFoundException(`Restore period expired for comment with id ${id}`);
+    }
+    comment.deletedAt = undefined;
+    return this.commentRepo.save(comment);
   }
 }

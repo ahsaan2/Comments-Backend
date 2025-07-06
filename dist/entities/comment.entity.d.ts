@@ -8,4 +8,5 @@ export declare class Comment {
     author: User;
     parent?: Comment;
     replies: Comment[];
+    deletedAt?: Date;
 }
