@@ -18,8 +18,6 @@ export class PostController {
 
     @Post()
     create(@Body() dto: PostDto): Promise<PostEntity> {
-      console.log("DTO received:", dto);
-
       return this.postService.create(dto);
     }
 

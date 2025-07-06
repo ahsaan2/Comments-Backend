@@ -10,6 +10,7 @@ export class CreateCommentDto {
 
   @IsInt()
   authorId!: number;
+  
   @IsInt()
   @IsOptional()
   parentId?: number;

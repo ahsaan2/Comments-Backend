@@ -22,7 +22,7 @@ let PostService = class PostService {
         this.postRepository = postRepository;
     }
     async create(dto) {
-        console.log("DTO received", dto);
+        console.log('DTO received', dto);
         var post = await this.postRepository.save(dto);
         return post;
     }

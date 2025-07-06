@@ -27,21 +27,22 @@ let CommentsService = class CommentsService {
     }
     async create(dto) {
         const post = await this.postRepo.findOne({ where: { id: dto.postId } });
-        const author = await this.userRepo.findOne({ where: { id: dto.authorId } });
-        if (!post || !author) {
-            throw new common_1.NotFoundException("Post or author not found");
+        const author = new user_entity_1.User();
+        console.log("Author", author);
+        if (!post) {
+            throw new common_1.NotFoundException("Post not found");
         }
         let parent = undefined;
-        if (dto.parentId) {
+        if (typeof (dto.parentId) != undefined && dto.parentId != undefined && dto.parentId > 0) {
             const foundParent = await this.commentRepo.findOne({ where: { id: dto.parentId } });
             if (!foundParent) {
                 throw new common_1.NotFoundException("parent comment not found");
             }
+            parent = foundParent;
         }
         const comment = this.commentRepo.create({
             content: dto.content,
             post,
-            author,
             parent,
         });
         console.log('Comment before save', comment);
@@ -50,7 +51,7 @@ let CommentsService = class CommentsService {
     async findOne(id) {
         const comment = await this.commentRepo.findOne({
             where: { id },
-            relations: ["author", "post", "parent", "replies"],
+            relations: ["post", "parent", "replies"],
         });
         if (!comment) {
             throw new common_1.NotFoundException(`Comment with id ${id} not found`);
@@ -60,33 +61,33 @@ let CommentsService = class CommentsService {
     async loadReplies(comment) {
         const replies = await this.commentRepo.find({
             where: { parent: { id: comment.id } },
-            relations: ["author", "post"],
+            relations: ["post"],
             order: { createdAt: "ASC" },
         });
         return {
             id: comment.id,
             content: comment.content,
             createdAt: comment.createdAt,
-            author: comment.author,
             post: comment.post,
             replies: await Promise.all(replies.map((reply) => this.loadReplies(reply))),
         };
     }
     async findAll() {
         return this.commentRepo.find({
-            relations: ["author", "post", "parent", "replies"],
+            relations: ["post", "parent", "replies"],
             order: { createdAt: "ASC" },
         });
     }
     async getThreadedComments(postId) {
+        console.log("Get Threaded comments for postId", postId);
         const topComments = await this.commentRepo.find({
             where: {
                 post: { id: postId },
-                parent: (0, typeorm_2.IsNull)(),
             },
-            relations: ["author", "post"],
+            relations: ["post"],
             order: { createdAt: "ASC" },
         });
+        console.log("Top Comments", topComments);
         return Promise.all(topComments.map((comment) => this.loadReplies(comment)));
     }
     async update(id, content) {
@@ -107,13 +108,15 @@ let CommentsService = class CommentsService {
     async delete(id) {
         const comment = await this.commentRepo.findOne({ where: { id } });
         if (!comment) {
-            throw new common_1.NotFoundException(`Comment with id ${id} not found`);
+            throw new common_1.NotFoundException(`Alas! Comment with id ${id} not found`);
         }
         comment.deletedAt = new Date();
         await this.commentRepo.save(comment);
     }
     async restore(id) {
-        const comment = await this.commentRepo.findOne({ where: { id } });
+        const comment = await this.commentRepo.findOne({ where: { id },
+            withDeleted: true });
+        console.log("You are trying to restore the current id ", id);
         if (!comment) {
             throw new common_1.NotFoundException(`Comment with id ${id} not found`);
         }
@@ -127,8 +130,16 @@ let CommentsService = class CommentsService {
         if (diffMinutes > 15) {
             throw new common_1.NotFoundException(`Restore period expired for comment with id ${id}`);
         }
-        comment.deletedAt = undefined;
-        return this.commentRepo.save(comment);
+        console.log(`We are trying to log your comment id ${id}`);
+        await this.commentRepo.restore(id);
+        const restored = await this.commentRepo.findOne({
+            where: { id }
+        });
+        if (!restored) {
+            throw new common_1.NotFoundException("error restoring comment of id");
+        }
+        console.log("We are set to restore your comment", comment);
+        return restored;
     }
 };
 exports.CommentsService = CommentsService;

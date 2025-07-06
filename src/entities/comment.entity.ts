@@ -22,20 +22,19 @@ export class Comment {
   @CreateDateColumn()
   createdAt!: Date;
 
+  @DeleteDateColumn()
+  deletedAt?: Date;
+
   @ManyToOne(() => PostEntity, (post) => post.comments)
   post!: PostEntity;
 
   @ManyToOne(() => User, (user) => user.comments)
   author!: User;
 
-// Allow Top-Lvel comments 
   @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true })
-  @JoinColumn({name:'parentId'})
+  @JoinColumn({ name: 'parentId' })
   parent?: Comment;
 
   @OneToMany(() => Comment, (comment) => comment.parent)
   replies!: Comment[];
-
-  @DeleteDateColumn({ nullable: true })
-  deletedAt?: Date;
 }

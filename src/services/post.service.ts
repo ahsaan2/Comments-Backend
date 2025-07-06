@@ -12,8 +12,8 @@ export class PostService {
   ) {}
 
   async create(dto: PostDto): Promise<PostEntity> {
-    console.log("DTO received", dto);
-
+    console.log('DTO received', dto);
+    
     // The parent(post/comment) should be valid before adding this comment.
     var post = await this.postRepository.save(dto);
     return post;
@@ -29,7 +29,7 @@ export class PostService {
     }
     return postById;
   }
-  findAll(): Promise<PostEntity[]> {
+  findAll(): Promise<PostEntity[]>{
     return this.postRepository.find();
   }
 }

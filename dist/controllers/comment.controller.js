@@ -20,13 +20,15 @@ let CommentsController = class CommentsController {
     constructor(commentsService) {
         this.commentsService = commentsService;
     }
-    create(dto) {
-        return this.commentsService.create(dto);
+    async create(dto) {
+        console.log(dto);
+        return await this.commentsService.create(dto);
     }
     async createForPost(postId, dto) {
         return this.commentsService.create({ ...dto, postId });
     }
     getThreaded(postId) {
+        console.log("Get comments of post ", postId);
         return this.commentsService.getThreadedComments(postId);
     }
     async update(id, content) {
@@ -57,7 +59,6 @@ __decorate([
 ], CommentsController.prototype, "create", null);
 __decorate([
     (0, common_1.Post)(":postId"),
-    (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })),
     __param(0, (0, common_1.Param)("postId", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

@@ -22,28 +22,35 @@ export class CommentsService {
 
   
 async create(dto: CreateCommentDto): Promise<Comment> {
-  // console.log('Received dto', dto);
-  
-  const post = await this.postRepo.findOne({ where: { id: dto.postId } });
-  const author = await this.userRepo.findOne({ where: { id: dto.authorId } });
 
-  if (!post || !author) {
-    throw new NotFoundException("Post or author not found");
+  // Checking if there is a post with postId
+  const post = await this.postRepo.findOne({ where: { id: dto.postId } });
+
+  // checking if the user is present 
+
+  //@TODO Check for author validation
+  const author = new User();
+  //await this.userRepo.findOne({ where: { id: dto.authorId } });
+
+  console.log("Author",author);
+  if (!post) {
+    throw new NotFoundException("Post not found");
   }
 
   let parent: Comment | undefined = undefined;
 
-  if (dto.parentId) {
+  if (typeof(dto.parentId) != undefined && dto.parentId != undefined && dto.parentId > 0) {
     const foundParent = await this.commentRepo.findOne({ where: { id: dto.parentId } });
     if (!foundParent) {
       throw new NotFoundException("parent comment not found");
     }
+    parent = foundParent;
   }
 
   const comment = this.commentRepo.create({
     content: dto.content,
     post,
-    author,
+    // author,
     parent,
     // ...(parent && { parent }), // add parent only if it exists
   });
@@ -55,7 +62,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
   async findOne(id: number): Promise<any> {
     const comment = await this.commentRepo.findOne({
       where: { id },
-      relations: ["author", "post", "parent", "replies"],
+      relations: ["post", "parent", "replies"],
     });
 
     if (!comment) {
@@ -69,7 +76,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
   private async loadReplies(comment: Comment): Promise<any> {
     const replies = await this.commentRepo.find({
       where: { parent: { id: comment.id } },
-      relations: ["author", "post"],
+      relations: ["post"],
       order: { createdAt: "ASC" },
     });
 
@@ -77,7 +84,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
       id: comment.id,
       content: comment.content,
       createdAt: comment.createdAt,
-      author: comment.author,
+      // author: comment.author,
       post: comment.post,
       replies: await Promise.all(
         replies.map((reply) => this.loadReplies(reply))
@@ -87,22 +94,25 @@ async create(dto: CreateCommentDto): Promise<Comment> {
 
   async findAll(): Promise<Comment[]> {
     return this.commentRepo.find({
-      relations: ["author", "post", "parent", "replies"],
+      relations: ["post", "parent", "replies"],
       order: { createdAt: "ASC" },
     });
   }
 
   // Fetch all top-level comments with nested replies for a post
   async getThreadedComments(postId: number): Promise<any[]> {
+    console.log("Get Threaded comments for postId",postId);
+
+    // Direct childs of the post
     const topComments = await this.commentRepo.find({
       where: {
         post: { id: postId },
-        parent: IsNull(),
+        // parent: !IsNull(),
       },
-      relations: ["author", "post"],
+      relations: ["post"],
       order: { createdAt: "ASC" },
     });
-
+    console.log("Top Comments",topComments)
     return Promise.all(topComments.map((comment) => this.loadReplies(comment)));
   }
 
@@ -126,14 +136,20 @@ async create(dto: CreateCommentDto): Promise<Comment> {
   async delete(id: number): Promise<void> {
     const comment = await this.commentRepo.findOne({ where: { id } });
     if (!comment) {
-      throw new NotFoundException(`Comment with id ${id} not found`);
+      throw new NotFoundException(`Alas! Comment with id ${id} not found`);
     }
     comment.deletedAt = new Date();
     await this.commentRepo.save(comment);
   }
 
   async restore(id: number): Promise<Comment> {
-    const comment = await this.commentRepo.findOne({ where: { id } });
+    const comment = await this.commentRepo.findOne({ where: { id } 
+    ,
+    withDeleted: true});
+
+    console.log("You are trying to restore the current id ", id)
+    // Soft-delete -->> the row is not removed from the db but  deletedAt is set.
+
     if (!comment) {
       throw new NotFoundException(`Comment with id ${id} not found`);
     }
@@ -147,7 +163,20 @@ async create(dto: CreateCommentDto): Promise<Comment> {
     if (diffMinutes > 15) {
       throw new NotFoundException(`Restore period expired for comment with id ${id}`);
     }
-    comment.deletedAt = undefined;
-    return this.commentRepo.save(comment);
+    console.log(`We are trying to log your comment id ${id}`);
+    
+    // comment.deletedAt = undefined;
+    await this.commentRepo.restore(id)
+    // get the comment
+    const restored = await this.commentRepo.findOne({
+      where: {id}
+    })
+    if(!restored){
+      throw new NotFoundException("error restoring comment of id")
+    }
+    console.log("We are set to restore your comment", comment)
+    
+    return restored;
+    // return this.commentRepo.save(comment);
   }
 }

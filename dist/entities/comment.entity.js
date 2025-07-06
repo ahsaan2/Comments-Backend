@@ -29,6 +29,10 @@ __decorate([
     __metadata("design:type", Date)
 ], Comment.prototype, "createdAt", void 0);
 __decorate([
+    (0, typeorm_1.DeleteDateColumn)(),
+    __metadata("design:type", Date)
+], Comment.prototype, "deletedAt", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => post_entity_1.PostEntity, (post) => post.comments),
     __metadata("design:type", post_entity_1.PostEntity)
 ], Comment.prototype, "post", void 0);
@@ -45,10 +49,6 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => Comment, (comment) => comment.parent),
     __metadata("design:type", Array)
 ], Comment.prototype, "replies", void 0);
-__decorate([
-    (0, typeorm_1.DeleteDateColumn)({ nullable: true }),
-    __metadata("design:type", Date)
-], Comment.prototype, "deletedAt", void 0);
 exports.Comment = Comment = __decorate([
     (0, typeorm_1.Entity)()
 ], Comment);

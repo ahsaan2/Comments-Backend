@@ -1,5 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Comment } from './comment.entity';
+import { Post } from '@nestjs/common';
+import { PostEntity } from './post.entity';
 
 @Entity()
 export class User {
@@ -9,6 +11,9 @@ export class User {
   @Column()
   username!: string;
 
-  @OneToMany(() => Comment, (comment: Comment) => comment.author)
+   @OneToMany(() => PostEntity, (post) => post.author)
+  posts!: PostEntity[];
+
+  @OneToMany(() => Comment, (comment) => comment.author)
   comments!: Comment[];
 }

@@ -22,7 +22,6 @@ let PostController = class PostController {
         this.postService = postService;
     }
     create(dto) {
-        console.log("DTO received:", dto);
         return this.postService.create(dto);
     }
     async findOne(id) {
