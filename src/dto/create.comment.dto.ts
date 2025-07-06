@@ -1,15 +1,17 @@
-import { IsNotEmpty, isNumber, IsNumber, IsOptional } from "class-validator";
+import { IsString, IsNotEmpty, IsInt, IsOptional } from "class-validator";
+
 export class CreateCommentDto {
-  @IsNotEmpty({ message: "Content must not be empty" })
+  @IsString()
+  @IsNotEmpty()
   content!: string;
 
-  @IsNumber()
+  @IsInt()
   postId!: number;
-  @IsNumber()
-  authorId!: number;
 
+  @IsInt()
+  authorId!: number;
+  @IsInt()
   @IsOptional()
-  @IsNumber()
   parentId?: number;
 }
 

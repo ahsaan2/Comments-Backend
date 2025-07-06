@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Console } from "console";
 import { PostEntity, PostDto } from "src/entities/post.entity";
 import { Repository } from "typeorm";
 
@@ -11,6 +12,8 @@ export class PostService {
   ) {}
 
   async create(dto: PostDto): Promise<PostEntity> {
+    console.log("DTO received", dto);
+
     // The parent(post/comment) should be valid before adding this comment.
     var post = await this.postRepository.save(dto);
     return post;
@@ -25,5 +28,8 @@ export class PostService {
       throw new NotFoundException(`post with id ${id} is not found`);
     }
     return postById;
+  }
+  findAll(): Promise<PostEntity[]> {
+    return this.postRepository.find();
   }
 }

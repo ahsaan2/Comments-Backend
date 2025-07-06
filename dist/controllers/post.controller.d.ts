@@ -5,4 +5,5 @@ export declare class PostController {
     constructor(postService: PostService);
     create(dto: PostDto): Promise<PostEntity>;
     findOne(id: number): Promise<PostEntity>;
+    findAll(): Promise<PostEntity[]>;
 }

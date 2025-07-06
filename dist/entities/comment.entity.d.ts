@@ -6,6 +6,6 @@ export declare class Comment {
     createdAt: Date;
     post: PostEntity;
     author: User;
-    parent: Comment;
+    parent?: Comment;
     replies: Comment[];
 }

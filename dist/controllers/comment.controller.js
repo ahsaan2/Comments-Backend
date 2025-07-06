@@ -21,10 +21,14 @@ let CommentsController = class CommentsController {
         this.commentsService = commentsService;
     }
     create(dto) {
+        console.log("DTO in controller:", dto);
         return this.commentsService.create(dto);
     }
-    async getComment(id) {
-        return this.commentsService.findOne(id);
+    async createForPost(postId, dto) {
+        return this.commentsService.create({ ...dto, postId });
+    }
+    getByPost(postId) {
+        return this.commentsService.getThreadedComments(postId);
     }
     getThreaded(postId) {
         return this.commentsService.getThreadedComments(postId);
@@ -39,15 +43,23 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CommentsController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)(":id"),
-    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    (0, common_1.Post)("/:postid"),
+    __param(0, (0, common_1.Param)("postId")),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, create_comment_dto_1.CreateCommentDto]),
+    __metadata("design:returntype", Promise)
+], CommentsController.prototype, "createForPost", null);
+__decorate([
+    (0, common_1.Get)("post/postId"),
+    __param(0, (0, common_1.Param)("postId", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", Promise)
-], CommentsController.prototype, "getComment", null);
+    __metadata("design:returntype", void 0)
+], CommentsController.prototype, "getByPost", null);
 __decorate([
     (0, common_1.Get)("/post/:postId"),
-    __param(0, (0, common_1.Param)("postid", common_1.ParseIntPipe)),
+    __param(0, (0, common_1.Param)("postId", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)

@@ -22,6 +22,7 @@ let PostService = class PostService {
         this.postRepository = postRepository;
     }
     async create(dto) {
+        console.log("DTO received", dto);
         var post = await this.postRepository.save(dto);
         return post;
     }
@@ -33,6 +34,9 @@ let PostService = class PostService {
             throw new common_1.NotFoundException(`post with id ${id} is not found`);
         }
         return postById;
+    }
+    findAll() {
+        return this.postRepository.find();
     }
 };
 exports.PostService = PostService;

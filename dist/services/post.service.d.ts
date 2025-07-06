@@ -5,4 +5,5 @@ export declare class PostService {
     constructor(postRepository: Repository<PostEntity>);
     create(dto: PostDto): Promise<PostEntity>;
     findOne(id: number): Promise<PostEntity>;
+    findAll(): Promise<PostEntity[]>;
 }

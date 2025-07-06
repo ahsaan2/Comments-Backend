@@ -30,7 +30,7 @@ export class Comment {
 // Allow Top-Lvel comments 
   @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true })
   @JoinColumn({name:'parentId'})
-  parent!: Comment;
+  parent?: Comment;
 
   @OneToMany(() => Comment, (comment) => comment.parent)
   replies!: Comment[];

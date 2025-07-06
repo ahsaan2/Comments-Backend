@@ -31,15 +31,20 @@ let CommentsService = class CommentsService {
         if (!post || !author) {
             throw new common_1.NotFoundException("Post or author not found");
         }
-        const parent = dto.parentId
-            ? await this.commentRepo.findOne({ where: { id: dto.parentId } })
-            : undefined;
+        let parent = undefined;
+        if (dto.parentId) {
+            const foundParent = await this.commentRepo.findOne({ where: { id: dto.parentId } });
+            if (!foundParent) {
+                throw new common_1.NotFoundException("parent comment not found");
+            }
+        }
         const comment = this.commentRepo.create({
             content: dto.content,
             post,
             author,
-            ...(parent && { parent }),
+            parent,
         });
+        console.log('Comment before save', comment);
         return await this.commentRepo.save(comment);
     }
     async findOne(id) {

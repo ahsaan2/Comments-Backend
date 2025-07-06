@@ -22,10 +22,14 @@ let PostController = class PostController {
         this.postService = postService;
     }
     create(dto) {
+        console.log("DTO received:", dto);
         return this.postService.create(dto);
     }
     async findOne(id) {
         return this.postService.findOne(id);
+    }
+    async findAll() {
+        return this.postService.findAll();
     }
 };
 exports.PostController = PostController;
@@ -37,14 +41,20 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "create", null);
 __decorate([
-    (0, common_2.Get)(':id'),
-    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    (0, common_2.Get)(":id"),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "findOne", null);
+__decorate([
+    (0, common_2.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "findAll", null);
 exports.PostController = PostController = __decorate([
-    (0, common_1.Controller)('posts'),
+    (0, common_1.Controller)("posts"),
     __metadata("design:paramtypes", [post_service_1.PostService])
 ], PostController);
 //# sourceMappingURL=post.controller.js.map

@@ -5,6 +5,7 @@ import { Comment } from "src/entities/comment.entity";
 import { PostEntity } from "src/entities/post.entity";
 import { User } from "src/entities/user.entity";
 import { CreateCommentDto } from "src/dto/create.comment.dto";
+import { log } from "node:console";
 
 @Injectable()
 export class CommentsService {
@@ -19,27 +20,37 @@ export class CommentsService {
     private readonly userRepo: Repository<User>
   ) {}
 
-  async create(dto: CreateCommentDto): Promise<Comment> {
-    const post = await this.postRepo.findOne({ where: { id: dto.postId } });
-    const author = await this.userRepo.findOne({ where: { id: dto.authorId } });
+  
+async create(dto: CreateCommentDto): Promise<Comment> {
+  // console.log('Received dto', dto);
+  
+  const post = await this.postRepo.findOne({ where: { id: dto.postId } });
+  const author = await this.userRepo.findOne({ where: { id: dto.authorId } });
 
-    if (!post || !author) {
-      throw new NotFoundException("Post or author not found");
-    }
-
-    const parent = dto.parentId
-      ? await this.commentRepo.findOne({ where: { id: dto.parentId } })
-      : undefined;
-
-    const comment = this.commentRepo.create({
-      content: dto.content,
-      post,
-      author,
-      ...(parent && { parent }),
-    });
-
-    return await this.commentRepo.save(comment);
+  if (!post || !author) {
+    throw new NotFoundException("Post or author not found");
   }
+
+  let parent: Comment | undefined = undefined;
+
+  if (dto.parentId) {
+    const foundParent = await this.commentRepo.findOne({ where: { id: dto.parentId } });
+    if (!foundParent) {
+      throw new NotFoundException("parent comment not found");
+    }
+  }
+
+  const comment = this.commentRepo.create({
+    content: dto.content,
+    post,
+    author,
+    parent,
+    // ...(parent && { parent }), // add parent only if it exists
+  });
+  console.log('Comment before save', comment);
+  
+  return await this.commentRepo.save(comment);
+}
 
   async findOne(id: number): Promise<any> {
     const comment = await this.commentRepo.findOne({
@@ -68,7 +79,9 @@ export class CommentsService {
       createdAt: comment.createdAt,
       author: comment.author,
       post: comment.post,
-      replies: await Promise.all(replies.map((reply) => this.loadReplies(reply))),
+      replies: await Promise.all(
+        replies.map((reply) => this.loadReplies(reply))
+      ),
     };
   }
 
