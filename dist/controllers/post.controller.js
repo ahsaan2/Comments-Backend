@@ -13,10 +13,10 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostController = void 0;
-const post_entity_1 = require("../entities/post.entity");
 const post_service_1 = require("../services/post.service");
 const common_1 = require("@nestjs/common");
 const common_2 = require("@nestjs/common");
+const create_post_dto_1 = require("../dto/create.post.dto");
 let PostController = class PostController {
     constructor(postService) {
         this.postService = postService;
@@ -36,7 +36,7 @@ __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [post_entity_1.PostDto]),
+    __metadata("design:paramtypes", [create_post_dto_1.CreatePostDto]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "create", null);
 __decorate([

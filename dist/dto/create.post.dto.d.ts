@@ -1,4 +1,6 @@
-export declare class createPostDto {
-    postTitle: string;
+export declare class CreatePostDto {
+    title: string;
     content: string;
+    authorId: number;
+    authorName: string;
 }

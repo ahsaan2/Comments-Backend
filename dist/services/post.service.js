@@ -17,18 +17,29 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const post_entity_1 = require("../entities/post.entity");
 const typeorm_2 = require("typeorm");
+const author_service_1 = require("./author.service");
 let PostService = class PostService {
-    constructor(postRepository) {
+    constructor(postRepository, authorRepository) {
         this.postRepository = postRepository;
+        this.authorRepository = authorRepository;
     }
     async create(dto) {
         console.log('DTO received', dto);
-        var post = await this.postRepository.save(dto);
-        return post;
+        const author = await this.authorRepository.findOne(dto.authorId);
+        if (!author) {
+            throw new common_1.NotFoundException("Author not found!");
+        }
+        const post = this.postRepository.create({
+            title: dto.title,
+            content: dto.content,
+            author: author
+        });
+        return this.postRepository.save(post);
     }
     async findOne(id) {
         const postById = await this.postRepository.findOne({
             where: { id },
+            relations: ["post", "parent", "replies", "author"],
         });
         if (!postById) {
             throw new common_1.NotFoundException(`post with id ${id} is not found`);
@@ -43,6 +54,7 @@ exports.PostService = PostService;
 exports.PostService = PostService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(post_entity_1.PostEntity)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        author_service_1.AuthorService])
 ], PostService);
 //# sourceMappingURL=post.service.js.map

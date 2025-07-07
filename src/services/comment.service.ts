@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, IsNull, MoreThan } from "typeorm";
+import { Repository, IsNull, MoreThan, Auth } from "typeorm";
 import { Comment } from "src/entities/comment.entity";
 import { PostEntity } from "src/entities/post.entity";
-import { User } from "src/entities/user.entity";
+import { Author } from "src/entities/author.entity";
 import { CreateCommentDto } from "src/dto/create.comment.dto";
-import { log } from "node:console";
+import { log, timeStamp } from "node:console";
 
 @Injectable()
 export class CommentsService {
@@ -16,8 +16,8 @@ export class CommentsService {
     @InjectRepository(PostEntity)
     private readonly postRepo: Repository<PostEntity>,
 
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>
+    @InjectRepository(Author)
+    private readonly userRepo: Repository<Author>
   ) {}
 
   
@@ -25,38 +25,64 @@ async create(dto: CreateCommentDto): Promise<Comment> {
 
   // Checking if there is a post with postId
   const post = await this.postRepo.findOne({ where: { id: dto.postId } });
+  const author = await this.userRepo.findOne({ where: {id : dto.authorId}})
+  // const authorName = await this.userRepo.findOne({where: {authorName : dto.authorName}})
+  let finalAuthor : Author | null = null;
+  // check if the author and the authorname is present
+  if(dto.authorId){
+    finalAuthor = await this.userRepo.findOne({
+      where: {id: dto.authorId}
+    })
+  }
 
-  // checking if the user is present 
-
+  if(!finalAuthor){
+    if(!dto.authorName){
+      throw new NotFoundException("Author not found and no name provided!")
+    }
+    
+   // create new author
+  const newAuthor = this.userRepo.create({username: dto.authorName});
+  finalAuthor = await this.userRepo.save(newAuthor);
+  
   //@TODO Check for author validation
-  const author = new User();
+  // const author = new User();
   //await this.userRepo.findOne({ where: { id: dto.authorId } });
 
-  console.log("Author",author);
-  if (!post) {
-    throw new NotFoundException("Post not found");
+  // console.log("Author",author);
+
+  // if(!author){
+  //   throw new NotFoundException("Author not found!")
   }
 
   let parent: Comment | undefined = undefined;
 
   if (typeof(dto.parentId) != undefined && dto.parentId != undefined && dto.parentId > 0) {
-    const foundParent = await this.commentRepo.findOne({ where: { id: dto.parentId } });
+    const foundParent = await this.commentRepo.findOne({ where: { id: dto.parentId }
+    
+   });
     if (!foundParent) {
       throw new NotFoundException("parent comment not found");
     }
     parent = foundParent;
   }
 
-  const comment = this.commentRepo.create({
-    content: dto.content,
-    post,
-    // author,
-    parent,
-    // ...(parent && { parent }), // add parent only if it exists
-  });
+  
+
+  if (!post) {
+    throw new NotFoundException("Post not found");
+  }
+
+
+ const comment = this.commentRepo.create({
+  content: dto.content,
+  post,
+  author: finalAuthor,
+  parent,
+});
+
   console.log('Comment before save', comment);
   
-  return await this.commentRepo.save(comment);
+  return this.commentRepo.save(comment);
 }
 
   async findOne(id: number): Promise<any> {
@@ -76,7 +102,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
   private async loadReplies(comment: Comment): Promise<any> {
     const replies = await this.commentRepo.find({
       where: { parent: { id: comment.id } },
-      relations: ["post"],
+      relations: ["post", "author"],
       order: { createdAt: "ASC" },
     });
 
@@ -84,7 +110,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
       id: comment.id,
       content: comment.content,
       createdAt: comment.createdAt,
-      // author: comment.author,
+      author: comment.author,
       post: comment.post,
       replies: await Promise.all(
         replies.map((reply) => this.loadReplies(reply))

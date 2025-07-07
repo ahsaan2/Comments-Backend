@@ -1,4 +1,4 @@
-import { PostDto, PostEntity } from "src/entities/post.entity";
+import { PostEntity } from "src/entities/post.entity";
 import { PostService } from "src/services/post.service";
 import {
   Controller,
@@ -10,14 +10,14 @@ import {
 } from "@nestjs/common";
 import { Get } from "@nestjs/common";
 import { query } from "express";
-import { createPostDto } from "../dto/create.post.dto";
+import { CreatePostDto } from "../dto/create.post.dto";
 
 @Controller("posts")
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
     @Post()
-    create(@Body() dto: PostDto): Promise<PostEntity> {
+    create(@Body() dto: CreatePostDto): Promise<PostEntity> {
       return this.postService.create(dto);
     }
 

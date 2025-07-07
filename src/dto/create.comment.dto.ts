@@ -6,15 +6,24 @@ export class CreateCommentDto {
   content!: string;
 
   @IsInt()
+  @IsNotEmpty()
   postId!: number;
 
   @IsInt()
-  authorId!: number;
+  @IsOptional()
+  authorId?: number;
   
   @IsInt()
   @IsOptional()
   parentId?: number;
+  
+  @IsOptional()
+  @IsString()
+  authorName ?: string
 }
+
+  
+
 
 /**
  * DTO -->> (Data Transfer Object) is a design pattern used to define the structure of data that is

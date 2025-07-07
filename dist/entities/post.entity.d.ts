@@ -1,14 +1,10 @@
 import { Comment } from './comment.entity';
-import { User } from './user.entity';
-export declare class PostDto {
-    title: string;
-    content: string;
-}
+import { Author } from './author.entity';
 export declare class PostEntity {
     id: number;
     title: string;
     content: string;
-    author: User;
+    author: Author;
     posts: PostEntity[];
     comments: Comment[];
 }

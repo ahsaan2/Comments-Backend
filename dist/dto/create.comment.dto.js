@@ -21,10 +21,12 @@ __decorate([
 ], CreateCommentDto.prototype, "content", void 0);
 __decorate([
     (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
 ], CreateCommentDto.prototype, "postId", void 0);
 __decorate([
     (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateCommentDto.prototype, "authorId", void 0);
 __decorate([
@@ -32,4 +34,9 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateCommentDto.prototype, "parentId", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateCommentDto.prototype, "authorName", void 0);
 //# sourceMappingURL=create.comment.dto.js.map

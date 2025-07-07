@@ -10,6 +10,7 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const comment_module_1 = require("./modules/comment.module");
+const author_module_1 = require("./modules/author.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -22,11 +23,12 @@ exports.AppModule = AppModule = __decorate([
                 port: 5432,
                 username: "postgres",
                 password: "ahsaan",
-                database: "commentsdb",
+                database: "commentsdb1",
                 autoLoadEntities: true,
                 synchronize: true,
             }),
             comment_module_1.CommentsModule,
+            author_module_1.AuthorModule
         ],
     })
 ], AppModule);

@@ -1,12 +1,17 @@
-import { IsString, IsNotEmpty, isNotEmpty} from 'class-validator';
-export class createPostDto{
+import { IsString, IsNotEmpty, isNotEmpty, IsInt} from 'class-validator';
+
+export class CreatePostDto{
     @IsString()
     @IsNotEmpty()
-    postTitle!: string;
+    title!: string;
 
     @IsString()
     @IsNotEmpty()
     content !: string;
 
+    @IsInt()
+    authorId !: number;
 
+    @IsNotEmpty()
+    authorName!: string;
 }

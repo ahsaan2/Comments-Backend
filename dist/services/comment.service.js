@@ -18,7 +18,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const comment_entity_1 = require("../entities/comment.entity");
 const post_entity_1 = require("../entities/post.entity");
-const user_entity_1 = require("../entities/user.entity");
+const author_entity_1 = require("../entities/author.entity");
 let CommentsService = class CommentsService {
     constructor(commentRepo, postRepo, userRepo) {
         this.commentRepo = commentRepo;
@@ -27,26 +27,40 @@ let CommentsService = class CommentsService {
     }
     async create(dto) {
         const post = await this.postRepo.findOne({ where: { id: dto.postId } });
-        const author = new user_entity_1.User();
-        console.log("Author", author);
-        if (!post) {
-            throw new common_1.NotFoundException("Post not found");
+        const author = await this.userRepo.findOne({ where: { id: dto.authorId } });
+        let finalAuthor = null;
+        if (dto.authorId) {
+            finalAuthor = await this.userRepo.findOne({
+                where: { id: dto.authorId }
+            });
+        }
+        if (!finalAuthor) {
+            if (!dto.authorName) {
+                throw new common_1.NotFoundException("Author not found and no name provided!");
+            }
+            const newAuthor = this.userRepo.create({ username: dto.authorName });
+            finalAuthor = await this.userRepo.save(newAuthor);
         }
         let parent = undefined;
         if (typeof (dto.parentId) != undefined && dto.parentId != undefined && dto.parentId > 0) {
-            const foundParent = await this.commentRepo.findOne({ where: { id: dto.parentId } });
+            const foundParent = await this.commentRepo.findOne({ where: { id: dto.parentId }
+            });
             if (!foundParent) {
                 throw new common_1.NotFoundException("parent comment not found");
             }
             parent = foundParent;
         }
+        if (!post) {
+            throw new common_1.NotFoundException("Post not found");
+        }
         const comment = this.commentRepo.create({
             content: dto.content,
             post,
+            author: finalAuthor,
             parent,
         });
         console.log('Comment before save', comment);
-        return await this.commentRepo.save(comment);
+        return this.commentRepo.save(comment);
     }
     async findOne(id) {
         const comment = await this.commentRepo.findOne({
@@ -61,13 +75,14 @@ let CommentsService = class CommentsService {
     async loadReplies(comment) {
         const replies = await this.commentRepo.find({
             where: { parent: { id: comment.id } },
-            relations: ["post"],
+            relations: ["post", "author"],
             order: { createdAt: "ASC" },
         });
         return {
             id: comment.id,
             content: comment.content,
             createdAt: comment.createdAt,
+            author: comment.author,
             post: comment.post,
             replies: await Promise.all(replies.map((reply) => this.loadReplies(reply))),
         };
@@ -147,7 +162,7 @@ exports.CommentsService = CommentsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(comment_entity_1.Comment)),
     __param(1, (0, typeorm_1.InjectRepository)(post_entity_1.PostEntity)),
-    __param(2, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __param(2, (0, typeorm_1.InjectRepository)(author_entity_1.Author)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository])

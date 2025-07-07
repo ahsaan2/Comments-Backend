@@ -9,19 +9,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPostDto = void 0;
+exports.CreatePostDto = void 0;
 const class_validator_1 = require("class-validator");
-class createPostDto {
+class CreatePostDto {
 }
-exports.createPostDto = createPostDto;
+exports.CreatePostDto = CreatePostDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], createPostDto.prototype, "postTitle", void 0);
+], CreatePostDto.prototype, "title", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], createPostDto.prototype, "content", void 0);
+], CreatePostDto.prototype, "content", void 0);
+__decorate([
+    (0, class_validator_1.IsInt)(),
+    __metadata("design:type", Number)
+], CreatePostDto.prototype, "authorId", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreatePostDto.prototype, "authorName", void 0);
 //# sourceMappingURL=create.post.dto.js.map

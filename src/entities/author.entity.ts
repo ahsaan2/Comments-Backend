@@ -4,14 +4,14 @@ import { Post } from '@nestjs/common';
 import { PostEntity } from './post.entity';
 
 @Entity()
-export class User {
+export class Author {
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Column()
   username!: string;
 
-   @OneToMany(() => PostEntity, (post) => post.author)
+  @OneToMany(() => PostEntity, (post) => post.author)
   posts!: PostEntity[];
 
   @OneToMany(() => Comment, (comment) => comment.author)

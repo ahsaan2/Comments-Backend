@@ -1,6 +1,7 @@
 export declare class CreateCommentDto {
     content: string;
     postId: number;
-    authorId: number;
+    authorId?: number;
     parentId?: number;
+    authorName?: string;
 }

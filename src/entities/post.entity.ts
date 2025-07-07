@@ -1,10 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { Comment } from './comment.entity';
-import { User } from './user.entity';
-export class PostDto{
-    title!: string;
-    content!: string;
-}
+import { Author } from './author.entity';
 
 @Entity()
 export class PostEntity {
@@ -17,11 +13,17 @@ export class PostEntity {
   @Column()
   content!: string;
 
-  @ManyToOne(() => User, user => user.posts)
-  author!: User;
-  @OneToMany(() => PostEntity, (post) => post.author)
-posts!: PostEntity[];
+  @ManyToOne(() => Author, (user) => user.id, {eager: false})
+  @JoinColumn({
+    name: 'authorId'
+  })
+  author!: Author;
 
+  // @Column({nullable: false})
+  // authorId!: number;
+
+  @OneToMany(() => PostEntity, (post) => post.author)
+  posts!: PostEntity[];
 
   @OneToMany(() => Comment, comment => comment.post)
   comments!: Comment[];

@@ -9,7 +9,7 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 import { PostEntity } from './post.entity';
-import { User } from './user.entity';
+import { Author } from './author.entity';
 
 @Entity()
 export class Comment {
@@ -20,16 +20,18 @@ export class Comment {
   content!: string;
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt!: Date;  // set to the current time-stamp
+
 
   @DeleteDateColumn()
-  deletedAt?: Date;
+  deletedAt?: Date;   // will be deleted at the current time-stamp
+  
 
   @ManyToOne(() => PostEntity, (post) => post.comments)
   post!: PostEntity;
 
-  @ManyToOne(() => User, (user) => user.comments)
-  author!: User;
+  @ManyToOne(() => Author, (user) => user.id)
+  author!: Author;
 
   @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true })
   @JoinColumn({ name: 'parentId' })

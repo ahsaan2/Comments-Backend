@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Comment = void 0;
 const typeorm_1 = require("typeorm");
 const post_entity_1 = require("./post.entity");
-const user_entity_1 = require("./user.entity");
+const author_entity_1 = require("./author.entity");
 let Comment = class Comment {
 };
 exports.Comment = Comment;
@@ -37,8 +37,8 @@ __decorate([
     __metadata("design:type", post_entity_1.PostEntity)
 ], Comment.prototype, "post", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.comments),
-    __metadata("design:type", user_entity_1.User)
+    (0, typeorm_1.ManyToOne)(() => author_entity_1.Author, (user) => user.id),
+    __metadata("design:type", author_entity_1.Author)
 ], Comment.prototype, "author", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => Comment, (comment) => comment.replies, { nullable: true }),

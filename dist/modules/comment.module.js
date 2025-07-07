@@ -13,15 +13,17 @@ const comment_controller_1 = require("../controllers/comment.controller");
 const comment_service_1 = require("../services/comment.service");
 const comment_entity_1 = require("../entities/comment.entity");
 const post_entity_1 = require("../entities/post.entity");
-const user_entity_1 = require("../entities/user.entity");
+const author_entity_1 = require("../entities/author.entity");
 const post_service_1 = require("../services/post.service");
 const post_controller_1 = require("../controllers/post.controller");
+const author_module_1 = require("./author.module");
 let CommentsModule = class CommentsModule {
 };
 exports.CommentsModule = CommentsModule;
 exports.CommentsModule = CommentsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([comment_entity_1.Comment, post_entity_1.PostEntity, user_entity_1.User])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([comment_entity_1.Comment, post_entity_1.PostEntity, author_entity_1.Author]),
+            author_module_1.AuthorModule],
         controllers: [comment_controller_1.CommentsController, post_controller_1.PostController],
         providers: [comment_service_1.CommentsService, post_service_1.PostService],
     })
