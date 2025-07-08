@@ -48,7 +48,7 @@ export class PostService {
     const postById = await this.postRepository.findOne({
       where: { id },
       // changed to get author name
-      relations: ["post", "parent", "replies", "author"],
+      relations: ["comments", "author"],
     });
     if (!postById) {
       throw new NotFoundException(`post with id ${id} is not found`);

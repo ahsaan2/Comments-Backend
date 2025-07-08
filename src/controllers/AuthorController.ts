@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthorService } from 'src/services/author.service';
-import { CreateAuthorDto } from 'src/dto/create.author.dto';
 import { Author } from 'src/entities/author.entity';
-
+// import { AuthService } from 'src/services/auth.service';
+import { CreateAuthorDto } from 'src/dto/create.signup.dto';
 @Controller('authors')
 export class AuthorController {
   constructor(private readonly authorService: AuthorService) {}
@@ -12,13 +12,19 @@ export class AuthorController {
     return this.authorService.create(createAuthorDto);
   }
 
+    // register a user request
+    @Post('register')
+    @UsePipes(new ValidationPipe({ whitelist: true}))
+    async register(@Body() dto: CreateAuthorDto){
+      return this.authorService.register(dto);
+    }
   @Get()
-  async findAll(): Promise<Author[]> {
+  async findAll(): Promise<Partial<Author>[]> {
     return this.authorService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<Author> {
+  async findOne(@Param('id') id: number): Promise<Partial<Author>> {
     return this.authorService.findOne(id);
   }
 }

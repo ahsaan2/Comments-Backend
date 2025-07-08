@@ -13,12 +13,11 @@ DONE tasks.
 8. Create an DELETE api to delete the post message, only allow deletion within 15minutes.
 9. Create an API to update the comment, only within 15minutes.
 10. Create an API to delete the comment, only within 15minutes.
-
+11. Store the author information in post and comment messages.
 ----------------------------------------------------------------------------------------------------------
 
 Backend Remaining tasks.
  
-5. Store the author information in post and comment messages.
 6. Add logic for login.
 7. Protect post api's with authentication.
 8. Add a layer of websocket to notify the user if there is a comment on his post. 

@@ -11,6 +11,12 @@ export class Author {
   @Column()
   username!: string;
 
+  @Column({nullable: false})
+  password !: string;
+
+  @Column()
+  email !: string;
+
   @OneToMany(() => PostEntity, (post) => post.author)
   posts!: PostEntity[];
 

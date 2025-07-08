@@ -6,7 +6,7 @@ import { PostEntity } from "src/entities/post.entity";
 import { Author } from "src/entities/author.entity";
 import { CreateCommentDto } from "src/dto/create.comment.dto";
 import { log, timeStamp } from "node:console";
-
+import { instanceToPlain  } from "class-transformer"
 @Injectable()
 export class CommentsService {
   constructor(
@@ -37,7 +37,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
 
   if(!finalAuthor){
     if(!dto.authorName){
-      throw new NotFoundException("Author not found and no name provided!")
+      throw new NotFoundException("Author not found. Please register yourself!")
     }
     
    // create new author
@@ -83,12 +83,15 @@ async create(dto: CreateCommentDto): Promise<Comment> {
   console.log('Comment before save', comment);
   
   return this.commentRepo.save(comment);
+  // return instanceToPlain(await this.commentRepo.save(comment))
 }
-
+ 
   async findOne(id: number): Promise<any> {
     const comment = await this.commentRepo.findOne({
       where: { id },
-      relations: ["post", "parent", "replies"],
+      // every time we load the replies, these things should be present, added author here
+      // relations: ["post", "parent", "replies", "author"],
+      relations: ["author", "comment"],
     });
 
     if (!comment) {
@@ -106,7 +109,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
       order: { createdAt: "ASC" },
     });
 
-    return {
+    return instanceToPlain({
       id: comment.id,
       content: comment.content,
       createdAt: comment.createdAt,
@@ -115,7 +118,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
       replies: await Promise.all(
         replies.map((reply) => this.loadReplies(reply))
       ),
-    };
+    });
   }
 
   async findAll(): Promise<Comment[]> {
@@ -135,7 +138,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
         post: { id: postId },
         // parent: !IsNull(),
       },
-      relations: ["post"],
+      relations: ["post", "author"],
       order: { createdAt: "ASC" },
     });
     console.log("Top Comments",topComments)

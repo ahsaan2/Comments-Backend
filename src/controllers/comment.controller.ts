@@ -26,7 +26,7 @@ export class CommentsController {
     return await this.commentsService.create(dto);
   } // this is like creating a first child of a post
 
-  // Creating a reply or a comment for a specific post
+
   @Post(":postId")
   // @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async createForPost(

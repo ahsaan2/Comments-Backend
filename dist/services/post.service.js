@@ -39,7 +39,7 @@ let PostService = class PostService {
     async findOne(id) {
         const postById = await this.postRepository.findOne({
             where: { id },
-            relations: ["post", "parent", "replies", "author"],
+            relations: ["comments", "author"],
         });
         if (!postById) {
             throw new common_1.NotFoundException(`post with id ${id} is not found`);

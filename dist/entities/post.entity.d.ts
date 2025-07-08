@@ -5,6 +5,5 @@ export declare class PostEntity {
     title: string;
     content: string;
     author: Author;
-    posts: PostEntity[];
     comments: Comment[];
 }

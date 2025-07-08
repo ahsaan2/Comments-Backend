@@ -22,8 +22,6 @@ export class PostEntity {
   // @Column({nullable: false})
   // authorId!: number;
 
-  @OneToMany(() => PostEntity, (post) => post.author)
-  posts!: PostEntity[];
 
   @OneToMany(() => Comment, comment => comment.post)
   comments!: Comment[];

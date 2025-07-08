@@ -25,6 +25,7 @@ let PostController = class PostController {
         return this.postService.create(dto);
     }
     async findOne(id) {
+        console.log('rendering the current post id', id);
         return this.postService.findOne(id);
     }
     async findAll() {

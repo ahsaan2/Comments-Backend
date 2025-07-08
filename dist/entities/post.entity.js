@@ -36,10 +36,6 @@ __decorate([
     __metadata("design:type", author_entity_1.Author)
 ], PostEntity.prototype, "author", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => PostEntity, (post) => post.author),
-    __metadata("design:type", Array)
-], PostEntity.prototype, "posts", void 0);
-__decorate([
     (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, comment => comment.post),
     __metadata("design:type", Array)
 ], PostEntity.prototype, "comments", void 0);

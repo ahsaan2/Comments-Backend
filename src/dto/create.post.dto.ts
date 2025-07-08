@@ -12,6 +12,6 @@ export class CreatePostDto{
     @IsInt()
     authorId !: number;
 
-    @IsNotEmpty()
-    authorName!: string;
+    @IsNotEmpty()  // since we are registering author, we can keep it optional
+    authorName?: string;
 }

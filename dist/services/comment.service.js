@@ -19,6 +19,7 @@ const typeorm_2 = require("typeorm");
 const comment_entity_1 = require("../entities/comment.entity");
 const post_entity_1 = require("../entities/post.entity");
 const author_entity_1 = require("../entities/author.entity");
+const class_transformer_1 = require("class-transformer");
 let CommentsService = class CommentsService {
     constructor(commentRepo, postRepo, userRepo) {
         this.commentRepo = commentRepo;
@@ -36,7 +37,7 @@ let CommentsService = class CommentsService {
         }
         if (!finalAuthor) {
             if (!dto.authorName) {
-                throw new common_1.NotFoundException("Author not found and no name provided!");
+                throw new common_1.NotFoundException("Author not found. Please register yourself!");
             }
             const newAuthor = this.userRepo.create({ username: dto.authorName });
             finalAuthor = await this.userRepo.save(newAuthor);
@@ -65,7 +66,7 @@ let CommentsService = class CommentsService {
     async findOne(id) {
         const comment = await this.commentRepo.findOne({
             where: { id },
-            relations: ["post", "parent", "replies"],
+            relations: ["author", "comment"],
         });
         if (!comment) {
             throw new common_1.NotFoundException(`Comment with id ${id} not found`);
@@ -78,14 +79,14 @@ let CommentsService = class CommentsService {
             relations: ["post", "author"],
             order: { createdAt: "ASC" },
         });
-        return {
+        return (0, class_transformer_1.instanceToPlain)({
             id: comment.id,
             content: comment.content,
             createdAt: comment.createdAt,
             author: comment.author,
             post: comment.post,
             replies: await Promise.all(replies.map((reply) => this.loadReplies(reply))),
-        };
+        });
     }
     async findAll() {
         return this.commentRepo.find({
@@ -99,7 +100,7 @@ let CommentsService = class CommentsService {
             where: {
                 post: { id: postId },
             },
-            relations: ["post"],
+            relations: ["post", "author"],
             order: { createdAt: "ASC" },
         });
         console.log("Top Comments", topComments);

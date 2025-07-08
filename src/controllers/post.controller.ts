@@ -23,6 +23,8 @@ export class PostController {
 
     @Get(":id")
     async findOne(@Param("id", ParseIntPipe) id: number) {
+      console.log('rendering the current post id',id);
+      
       return this.postService.findOne(id);
     }
   //   @Get()
