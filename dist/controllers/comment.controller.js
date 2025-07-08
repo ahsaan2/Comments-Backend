@@ -27,9 +27,13 @@ let CommentsController = class CommentsController {
     async createForPost(postId, dto) {
         return this.commentsService.create({ ...dto, postId });
     }
-    getThreaded(postId) {
+    async getThreaded(postId) {
         console.log("Get comments of post ", postId);
-        return this.commentsService.getThreadedComments(postId);
+        const threadedComments = await this.commentsService.getThreadedComments(postId);
+        if (threadedComments.length === 0) {
+            return { message: "No comments found for this post" };
+        }
+        return threadedComments;
     }
     async update(id, content) {
         return this.commentsService.update(id, content);
@@ -70,7 +74,7 @@ __decorate([
     __param(0, (0, common_1.Param)("postId", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CommentsController.prototype, "getThreaded", null);
 __decorate([
     (0, common_1.Put)(":id"),

@@ -136,7 +136,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
     const topComments = await this.commentRepo.find({
       where: {
         post: { id: postId },
-        // parent: !IsNull(),
+        parent: IsNull(),
       },
       relations: ["post", "author"],
       order: { createdAt: "ASC" },

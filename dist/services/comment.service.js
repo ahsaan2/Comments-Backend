@@ -99,6 +99,7 @@ let CommentsService = class CommentsService {
         const topComments = await this.commentRepo.find({
             where: {
                 post: { id: postId },
+                parent: (0, typeorm_2.IsNull)(),
             },
             relations: ["post", "author"],
             order: { createdAt: "ASC" },

@@ -38,9 +38,14 @@ export class CommentsController {
 
   // Get all threaded comments for a post
   @Get("/post/:postId")
-  getThreaded(@Param("postId", ParseIntPipe) postId: number) {
+  async getThreaded(@Param("postId", ParseIntPipe) postId: number) {
     console.log("Get comments of post ",postId);
-    return this.commentsService.getThreadedComments(postId);
+    const threadedComments = await this.commentsService.getThreadedComments(postId);
+    if(threadedComments.length === 0) {
+      return { message: "No comments found for this post" };
+    }
+    // return this.commentsService.getThreadedComments(postId);
+    return threadedComments;
   }
 
   // getThreaded(@Param('postId') postId: number): Promise<Comment[]> {

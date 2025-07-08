@@ -11,7 +11,18 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const comment_module_1 = require("./modules/comment.module");
 const author_module_1 = require("./modules/author.module");
+const cors = require("cors");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer
+            .apply(cors({
+            origin: ['http://localhost:3000'],
+            methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+            credentials: true,
+            allowedHeaders: 'Content-Type',
+        }))
+            .forRoutes('/');
+    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
