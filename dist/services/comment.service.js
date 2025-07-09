@@ -30,6 +30,9 @@ let CommentsService = class CommentsService {
         const post = await this.postRepo.findOne({ where: { id: dto.postId } });
         const author = await this.userRepo.findOne({ where: { id: dto.authorId } });
         let finalAuthor = null;
+        if (!post) {
+            throw new common_1.NotFoundException("Post not found. Please create a post first!");
+        }
         if (dto.authorId) {
             finalAuthor = await this.userRepo.findOne({
                 where: { id: dto.authorId }
@@ -93,6 +96,21 @@ let CommentsService = class CommentsService {
             relations: ["post", "parent", "replies"],
             order: { createdAt: "ASC" },
         });
+    }
+    async getFlatComments(postId) {
+        const comments = await this.commentRepo.find({
+            where: { post: { id: postId } },
+            relations: ["post", "author", "parent"],
+            order: { createdAt: "ASC" },
+        });
+        return comments.map(comment => ({
+            id: comment.id,
+            postId: comment.post.id,
+            parentId: comment.parent ? comment.parent.id : null,
+            content: comment.content,
+            author: comment.author?.username,
+            createdAt: comment.createdAt,
+        }));
     }
     async getThreadedComments(postId) {
         console.log("Get Threaded comments for postId", postId);

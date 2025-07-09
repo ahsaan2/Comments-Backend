@@ -28,7 +28,7 @@ export class CommentsController {
 
 
   @Post(":postId")
-  // @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async createForPost(
     @Param("postId", ParseIntPipe) postId: number,
     @Body() dto: CreateCommentDto
@@ -36,15 +36,22 @@ export class CommentsController {
     return this.commentsService.create({ ...dto, postId });
   }
 
+  // GET FLAT COMMENTS
+  @Get('/post/:postId')
+async getFlat(@Param('postId', ParseIntPipe) postId: number) {
+  return this.commentsService.getFlatComments(postId);
+}
+
+
   // Get all threaded comments for a post
-  @Get("/post/:postId")
+  // Corrected: Get all threaded comments for a post
+  @Get("/post/:postId/threaded")
   async getThreaded(@Param("postId", ParseIntPipe) postId: number) {
-    console.log("Get comments of post ",postId);
+    console.log("Get comments of post ", postId);
     const threadedComments = await this.commentsService.getThreadedComments(postId);
-    if(threadedComments.length === 0) {
+    if (!threadedComments || threadedComments.length === 0) {
       return { message: "No comments found for this post" };
     }
-    // return this.commentsService.getThreadedComments(postId);
     return threadedComments;
   }
 

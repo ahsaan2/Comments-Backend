@@ -1,3 +1,4 @@
+    
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -37,6 +38,23 @@ export class AuthorService{
         return this.authorRepository.save(user);
       }
     
+
+      // login user
+    async login(email: string, password: string): Promise<Partial<Author>> {
+        // Find user by email
+        const user = await this.authorRepository.findOne({ where: { email } });
+        if (!user) {
+            throw new NotFoundException('Invalid email or password');
+        }
+        // Compare password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            throw new NotFoundException('Invalid email or password');
+        }
+        // Exclude password from returned user
+        const { password: _password, ...rest } = user;
+        return rest;
+    }
     async create(authorData: Partial<Author>): Promise<Author>{
         const author = this.authorRepository.create(authorData);
         return this.authorRepository.save(author);

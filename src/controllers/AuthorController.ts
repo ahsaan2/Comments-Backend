@@ -18,6 +18,14 @@ export class AuthorController {
     async register(@Body() dto: CreateAuthorDto){
       return this.authorService.register(dto);
     }
+
+// Login for a user
+  @Post('login')
+  @UsePipes(new ValidationPipe({ whitelist: true }))  
+  async login(@Body('email') email: string, @Body('password') password: string): Promise<Partial<Author>> {
+    return this.authorService.login(email, password);
+  }
+
   @Get()
   async findAll(): Promise<Partial<Author>[]> {
     return this.authorService.findAll();

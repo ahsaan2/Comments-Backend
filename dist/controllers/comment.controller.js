@@ -27,10 +27,13 @@ let CommentsController = class CommentsController {
     async createForPost(postId, dto) {
         return this.commentsService.create({ ...dto, postId });
     }
+    async getFlat(postId) {
+        return this.commentsService.getFlatComments(postId);
+    }
     async getThreaded(postId) {
         console.log("Get comments of post ", postId);
         const threadedComments = await this.commentsService.getThreadedComments(postId);
-        if (threadedComments.length === 0) {
+        if (!threadedComments || threadedComments.length === 0) {
             return { message: "No comments found for this post" };
         }
         return threadedComments;
@@ -63,6 +66,7 @@ __decorate([
 ], CommentsController.prototype, "create", null);
 __decorate([
     (0, common_1.Post)(":postId"),
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })),
     __param(0, (0, common_1.Param)("postId", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -70,7 +74,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CommentsController.prototype, "createForPost", null);
 __decorate([
-    (0, common_1.Get)("/post/:postId"),
+    (0, common_1.Get)('/post/:postId'),
+    __param(0, (0, common_1.Param)('postId', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], CommentsController.prototype, "getFlat", null);
+__decorate([
+    (0, common_1.Get)("/post/:postId/threaded"),
     __param(0, (0, common_1.Param)("postId", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),

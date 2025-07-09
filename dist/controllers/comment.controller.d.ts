@@ -6,6 +6,7 @@ export declare class CommentsController {
     constructor(commentsService: CommentsService);
     create(dto: CreateCommentDto): Promise<Comment>;
     createForPost(postId: number, dto: CreateCommentDto): Promise<Comment>;
+    getFlat(postId: number): Promise<any[]>;
     getThreaded(postId: number): Promise<any[] | {
         message: string;
     }>;

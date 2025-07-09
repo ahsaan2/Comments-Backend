@@ -28,6 +28,10 @@ async create(dto: CreateCommentDto): Promise<Comment> {
   const author = await this.userRepo.findOne({ where: {id : dto.authorId}})
   // const authorName = await this.userRepo.findOne({where: {authorName : dto.authorName}})
   let finalAuthor : Author | null = null;
+  if(!post){
+    throw new NotFoundException("Post not found. Please create a post first!");
+  }
+
   // check if the author and the authorname is present
   if(dto.authorId){
     finalAuthor = await this.userRepo.findOne({
@@ -127,12 +131,33 @@ async create(dto: CreateCommentDto): Promise<Comment> {
       order: { createdAt: "ASC" },
     });
   }
+    // FLAT FETCH COMMENTS
+    // In your commentsService
+async getFlatComments(postId: number): Promise<any[]> {
+  // Fetch all comments for the post, including replies, as a flat array
+  const comments = await this.commentRepo.find({
+    where: { post: { id: postId } },
+    relations: ["post", "author", "parent"],
+    order: { createdAt: "ASC" },
+  });
+
+  // Map to only the fields your frontend needs
+  return comments.map(comment => ({
+    id: comment.id,
+    postId: comment.post.id,
+    parentId: comment.parent ? comment.parent.id : null,
+    content: comment.content,
+    author: comment.author ?. username,
+    createdAt: comment.createdAt,
+  }));
+}
+
+
 
   // Fetch all top-level comments with nested replies for a post
   async getThreadedComments(postId: number): Promise<any[]> {
-    console.log("Get Threaded comments for postId",postId);
-
-    // Direct childs of the post
+    console.log("Get Threaded comments for postId", postId);
+    // Direct children of the post (top-level comments)
     const topComments = await this.commentRepo.find({
       where: {
         post: { id: postId },
@@ -141,7 +166,7 @@ async create(dto: CreateCommentDto): Promise<Comment> {
       relations: ["post", "author"],
       order: { createdAt: "ASC" },
     });
-    console.log("Top Comments",topComments)
+    console.log("Top Comments", topComments);
     return Promise.all(topComments.map((comment) => this.loadReplies(comment)));
   }
 
